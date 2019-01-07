@@ -220,13 +220,27 @@ namespace MySpace
             var z = x1 * y2 - y1 * x2;
             return z;
         }
-        // フリップ可能な四角形(n0-n2は対角)ならtrue,それ以外はfalse
+        // フリップ可能な凸形ならtrue,凹んでたらfalse
         private bool Flippable(int p0, int p1, int p2, int p3)
         {
-            if (CheckSide(p1, p2, p0) != CheckSide(p3, p0, p2))
+            if (CheckSide(p1, p2, p3) < 0)
             {
                 return false;
             }
+            if (CheckSide(p3, p0, p1) < 0)
+            {
+                return false;
+            }
+#if false
+            if (CheckSide(p2, p3, p0) < 0)
+            {
+                return false;
+            }
+            if (CheckSide(p0, p1, p2) < 0)
+            {
+                return false;
+            }
+#endif
             return true;
         }
         // n0,n1,n2の外接三角形内にn3が含まれていないとき＝ドローネ条件を満たすときtrue,それ以外はfalse
