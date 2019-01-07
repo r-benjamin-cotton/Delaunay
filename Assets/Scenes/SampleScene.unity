@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f178d276009f16c40a06362aa7ba2954, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numPoints: 4096
+  maxNumPoints: 4096
 --- !u!23 &431402226
 MeshRenderer:
   m_ObjectHideFlags: 0

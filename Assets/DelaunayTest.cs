@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using MySpace;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(MeshFilter))]
 public class DelaunayTest : MonoBehaviour
 {
     [SerializeField]
-    private int numPoints = 4096;
+    private int maxNumPoints = 4096;
 
     private MeshFilter meshFilter;
 
@@ -14,13 +17,10 @@ public class DelaunayTest : MonoBehaviour
     {
         var sw = new System.Diagnostics.Stopwatch();
         sw.Start();
-        var delaunay = new Delaunay(numPoints);
+        var delaunay = new Delaunay(maxNumPoints);
         {
-            delaunay.Insert(-2.0f, -2.0f);
-            delaunay.Insert(+2.0f, -2.0f);
-            delaunay.Insert(-2.0f, +2.0f);
-            delaunay.Insert(+2.0f, +2.0f);
-            for (var i = 4; i < numPoints; i++)
+            delaunay.Setup(0.0f, 0.0f, 4.0f);
+            for (var i = delaunay.NumPoints; i < maxNumPoints; i++)
             {
                 var x = UnityEngine.Random.value * 2.0f - 1.0f;
                 var y = UnityEngine.Random.value * 2.0f - 1.0f;
@@ -35,8 +35,8 @@ public class DelaunayTest : MonoBehaviour
             var px = UnityEngine.Random.value + 1.0f;
             var py = UnityEngine.Random.value + 1.0f;
             var ph = UnityEngine.Random.value + 0.1f;
-            var vertices = new Vector3[numPoints];
-            for (var i = 0; i < numPoints; i++)
+            var vertices = new Vector3[maxNumPoints];
+            for (var i = 0; i < maxNumPoints; i++)
             {
                 var x = delaunay.Points[i].x;
                 var y = delaunay.Points[i].y;
@@ -48,15 +48,18 @@ public class DelaunayTest : MonoBehaviour
         }
         {
             var triangles = new List<int>();
-            for (var i = 0; i < numPoints * 2; i++)
+            for (var i = 0; i < maxNumPoints * 2; i++)
             {
                 var p0 = delaunay.Triangles[i].p0;
                 var p1 = delaunay.Triangles[i].p1;
                 var p2 = delaunay.Triangles[i].p2;
+#if true
+                // バウンディングボックスは描画しない
                 if ((p0 < 4) || (p1 < 4) || (p2 < 4))
                 {
                     continue;
                 }
+#endif
                 triangles.Add(p0);
                 triangles.Add(p2);
                 triangles.Add(p1);
@@ -83,4 +86,19 @@ public class DelaunayTest : MonoBehaviour
             CreateMesh();
         }
     }
+#if UNITY_EDITOR
+    [CustomEditor(typeof(DelaunayTest))]
+    private class DelaunayTestEditor : Editor
+    {
+        public sealed override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            var obj = target as DelaunayTest;
+            if (GUILayout.Button("CreateMesh"))
+            {
+                obj.CreateMesh();
+            }
+        }
+    }
+#endif
 }
